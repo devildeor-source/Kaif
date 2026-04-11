@@ -3,175 +3,180 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LLUMEN AI | Invest Your Time</title>
+    <title>LLUMEN AI</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=JetBrains+Mono&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         :root {
-            --bg-color: #0d0d0d;        /* Deep Matte Black */
-            --card-bg: #161616;        /* Slightly lighter black for cards */
-            --accent-color: #00f2ff;    /* Neon Cyan */
-            --text-main: #e0e0e0;
-            --text-dim: #888888;
+            --bg-color: #0a0a0a;        /* Pitch Black */
+            --accent-blue: #2563eb;     /* The blue from your sketch */
+            --text-white: #ffffff;
+            --text-dim: #a0a0a0;
         }
-
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
         }
-
         body {
             background-color: var(--bg-color);
-            color: var(--text-main);
+            color: var(--text-white);
             font-family: 'Inter', sans-serif;
+            height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
-            min-height: 100vh;
+            overflow: hidden;
+        }
+        .container {
+            text-align: center;
+            width: 100%;
+            max-width: 400px;
             padding: 20px;
         }
-
-        .dashboard {
-            width: 100%;
-            max-width: 800px;
-            background: var(--card-bg);
-            border-radius: 20px;
-            padding: 40px;
-            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.7);
-            border: 1px solid #222;
-        }
-
-        header {
-            text-align: center;
-            margin-bottom: 40px;
-        }
-
-        header h1 {
+        .user-name {
+            color: var(--accent-blue);
+            font-size: 2.5rem;
             font-weight: 600;
-            font-size: 2.2rem;
-            letter-spacing: -1px;
-            text-transform: uppercase; /* Match your sketch */
-            background: linear-gradient(to right, #fff, var(--accent-color));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+            margin-bottom: 5px;
         }
-
-        /* Updated Moto Section to match your sketch */
-        .moto {
-            color: var(--text-dim);
+        .divider {
+            width: 120px;
+            height: 1px;
+            background: #444;
+            margin: 0 auto 20px auto;
+        }
+        .tagline {
+            font-family: 'JetBrains Mono', monospace;
+            color: #888;
             font-size: 0.9rem;
-            margin-top: 15px;
-            display: flex;
-            flex-direction: column;
-            gap: 5px;
-            align-items: center;
-        }
-
-        .moto-item {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .fa-xmark {
-            color: #ff4d4d; /* Red for cross */
-        }
-
-        .fa-check {
-            color: var(--accent-color); /* Cyan for check */
-        }
-
-        /* Input area styled to match your sketch */
-        .search-container {
-            position: relative;
             margin-bottom: 30px;
         }
+        .brand-title {
+            font-size: 2rem;
+            letter-spacing: 5px;
+            font-weight: 400;
+            margin-bottom: 40px;
+            text-transform: uppercase;
+        }
+        .moto-container {
+            margin-bottom: 60px;
+            font-size: 1.1rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
 
+        .moto-row {
+            margin: 10px 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .cross { color: #ff4444; }
+        .check { color: var(--accent-blue); }
+
+        /* The Pill-shaped Search Bar from your sketch */
         .search-wrapper {
-            position: relative;
             display: flex;
             align-items: center;
-            background: #1e1e1e;
-            border: 1px solid #333;
-            border-radius: 12px;
-            overflow: hidden; /* Important for icons */
+            border: 2px solid var(--accent-blue);
+            border-radius: 50px;
+            padding: 12px 20px;
+            background: rgba(37, 99, 235, 0.05);
         }
 
-        .search-icon {
-            padding: 0 15px;
-            color: var(--text-dim);
-            font-size: 1.1rem;
-        }
-
-        input[type="text"] {
-            flex-grow: 1;
+        .search-wrapper input {
+            flex: 1;
             background: transparent;
             border: none;
-            padding: 18px 5px; /* Adjust padding around icons */
-            color: white;
+            color: var(--accent-blue);
             font-size: 1rem;
+            text-transform: uppercase;
             outline: none;
-            font-family: 'Inter', sans-serif;
+            font-weight: 500;
         }
 
-        input[type="text"]::placeholder {
-            color: var(--text-dim);
+        .search-wrapper input::placeholder {
+            color: var(--accent-blue);
+            opacity: 0.7;
         }
 
-        .search-wrapper:focus-within {
-            border-color: var(--accent-color);
-            box-shadow: 0 0 15px rgba(0, 242, 255, 0.2);
-        }
-
-        /* Stylized Send Button */
-        #solveBtn {
+        .icon-btn {
             background: none;
             border: none;
-            color: var(--accent-color);
-            padding: 0 20px;
+            color: var(--accent-blue);
             font-size: 1.2rem;
             cursor: pointer;
-            transition: transform 0.2s, opacity 0.2s;
+            margin: 0 5px;
         }
 
-        #solveBtn:active {
-            transform: scale(1.1);
-        }
-
-        /* Mic Button */
-        #micBtn {
-            background: none;
-            border: none;
-            color: var(--text-dim);
-            padding: 0 5px;
-            font-size: 1.1rem;
-            cursor: pointer;
-            transition: color 0.3s;
-        }
-
-        #micBtn:hover {
-            color: var(--accent-color);
-        }
-
-        /* --- Rest of the style unchanged --- */
-        #result-container {
-            margin-top: 40px;
+        #response-box {
+            margin-top: 30px;
+            font-size: 0.9rem;
+            color: #ccc;
+            max-height: 150px;
+            overflow-y: auto;
             display: none;
-            animation: fadeIn 0.5s ease;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1 class="user-name">Kaif</h1>
+        <div class="divider"></div>
+        <p class="tagline">&lt;!DOCTYPE html&gt;</p>
+
+        <h2 class="brand-title">LLUMEN AI</h2>
+
+        <div class="moto-container">
+            <div class="moto-row">
+                <span>Spend your time</span>
+                <i class="fa-solid fa-xmark cross"></i>
+            </div>
+            <div class="moto-row">
+                <span>Invest your time</span>
+                <i class="fa-solid fa-check check"></i>
+            </div>
+        </div>
+
+        <div class="search-wrapper">
+            <button class="icon-btn" onclick="startMic()"><i class="fa-solid fa-microphone"></i></button>
+            <input type="text" id="userInput" placeholder="Ask anything">
+            <button class="icon-btn" onclick="sendQuery()"><i class="fa-solid fa-arrow-up-circle"></i></button>
+        </div>
+
+        <div id="response-box"></div>
+    </div>
+
+    <script>
+        async function sendQuery() {
+            const input = document.getElementById('userInput').value;
+            const resBox = document.getElementById('response-box');
+            if(!input) return;
+
+            resBox.style.display = 'block';
+            resBox.innerText = "Processing...";
+
+            try {
+                const response = await fetch('/api/search', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({query: input})
+                });
+                const data = await response.json();
+                resBox.innerText = data.solution;
+            } catch (e) {
+                resBox.innerText = "Error connecting to server.";
+            }
         }
 
-        .result-card {
-            background: #1a1a1a;
-            border-left: 4px solid var(--accent-color);
-            padding: 25px;
-            border-radius: 8px;
+        function startMic() {
+            alert("Microphone activated (Logic integration needed)");
         }
+    </script>
 
-        .result-card h3 {
-            font-size: 0.8rem;
-            text-transform: uppercase;
-            color: var(--accent-color);
-            margin-bottom: 15px;
-            letter-spacing: 1px;
-            
+</body>
+</html>
