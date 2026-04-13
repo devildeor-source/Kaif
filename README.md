@@ -3,194 +3,99 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LLUMEN AI | Invest Your Time</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=JetBrains+Mono&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" integrity="sha512-Fo3rlrZj/k7ujTnHg4CGR2D7kSs0v4LLanw2qksYuRlEzO+tcaEPQogQ0KaoGN26/zrn20ImR1DfuLWnOo7aBA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <title>LLUMEN AI</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=JetBrains+Mono&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
-        :root {
-            --bg-color: #0a0a0a;        /* Pitch Black background */
-            --accent-blue: #2563eb;     /* Blue from your sketch */
-            --text-white: #ffffff;
-            --text-dim: #a0a0a0;
-        }
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-        body {
-            background-color: var(--bg-color);
-            color: var(--text-white);
-            font-family: 'Inter', sans-serif;
-            height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            overflow: hidden;
-        }
-        .container {
-            text-align: center;
-            width: 100%;
-            max-width: 400px; /* Kept narrow for the mobile view in your sketch */
-            padding: 20px;
-        }
-        /* Top 'Kaif' and '<!DOCTYPE html>' section */
-        .user-name {
-            color: var(--accent-blue);
-            font-size: 2.5rem;
-            font-weight: 600;
-            margin-bottom: 5px;
-        }
-        .divider {
-            width: 120px;
-            height: 1px;
-            background: #444;
-            margin: 0 auto 20px auto;
-        }
-        .tagline {
-            font-family: 'JetBrains Mono', monospace;
-            color: #888;
-            font-size: 0.9rem;
-            margin-bottom: 30px;
-        }
-        /* Brand and Moto Section */
-        .brand-title {
-            font-size: 2.2rem;
-            letter-spacing: 5px;
-            font-weight: 400;
-            margin-bottom: 40px;
-            text-transform: uppercase;
-        }
-        .moto-container {
-            margin-bottom: 60px;
-            font-size: 1.1rem;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-        .moto-row {
-            margin: 10px 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 15px;
-        }
-        .cross { color: #ff4444; } /* Red X as in sketch */
-        .check { color: var(--accent-blue); } /* Blue check as in sketch */
-        /* --- Updated Pill-shaped Search Bar --- */
-        .search-wrapper {
-            display: flex;
-            align-items: center;
-            border: 2px solid var(--accent-blue); /* The distinct blue border from your drawing */
-            border-radius: 50px;
-            padding: 10px 15px; /* Adjust padding around icons */
-            background: rgba(37, 99, 235, 0.05); /* Slight blue tint inside */
-            position: relative;
-        }
-        /* Style for the 'Mic' button (Left) */
-        #micBtn {
-            background: none;
-            border: none;
-            color: var(--accent-blue);
-            font-size: 1rem;
-            cursor: pointer;
+        :root { --bg: #0a0a0a; --accent: #2563eb; --white: #ffffff; }
+        body { background: var(--bg); color: var(--white); font-family: 'Inter', sans-serif; height: 100vh; display: flex; justify-content: center; align-items: center; margin: 0; }
+        .container { text-align: center; width: 90%; max-width: 400px; }      
+        /* UI Elements from your Sketch */
+        .user-name { color: var(--accent); font-size: 2.5rem; margin-bottom: 5px; font-weight: 600; }
+        .divider { width: 100px; height: 1px; background: #333; margin: 0 auto 15px; }
+        .tagline { font-family: 'JetBrains Mono'; color: #666; font-size: 0.8rem; margin-bottom: 30px; }
+        .brand { font-size: 2rem; letter-spacing: 4px; margin-bottom: 40px; text-transform: uppercase; }
+        .moto { margin-bottom: 50px; text-transform: uppercase; font-size: 0.9rem; letter-spacing: 1px; font-weight: 300; }
+        .moto div { margin: 10px 0; display: flex; justify-content: center; align-items: center; gap: 10px; }
+        .cross { color: #ff4444; }
+        .check { color: var(--accent); }
+        /* --- THE CORRECTED PILL BAR --- */
+        .search-pill { 
+            display: flex; 
+            align-items: center; 
+            border: 2px solid var(--accent); 
+            border-radius: 50px; 
+            padding: 8px 12px; 
+            background: rgba(37,99,235,0.05);
+        }     
+        .search-pill input { 
+            flex: 1; 
+            background: transparent; 
+            border: none; 
+            color: white; 
+            outline: none; 
+            font-size: 1rem; 
             padding: 0 10px;
         }
-        /* The main input box 'Ask anything' */
-        .search-wrapper input {
-            flex: 1; /* Take up the remaining space */
-            background: transparent;
-            border: none;
-            color: var(--text-white);
-            font-size: 1rem;
-            outline: none;
-            font-weight: 500;
-            padding: 0 5px;
-        }
-        .search-wrapper input::placeholder {
-            color: var(--text-dim);
-            opacity: 0.8;
-        }
-        /* --- Style for the 'Send' button (Right) - Updated --- */
-        #solveBtn {
+        /* The Send Button Circle from your drawing */
+        .send-btn {
             background: none;
             border: none;
-            color: var(--accent-blue); /* Same accent blue for a clean look */
-            font-size: 1.5rem; /* Large and clear, just like the sketch */
+            color: var(--accent);
+            font-size: 1.5rem;
             cursor: pointer;
-            padding: 0 10px;
-            transition: color 0.3s ease, transform 0.2s;
-        }
-        #solveBtn:hover {
-            color: #fff; /* Turn white on hover to show it's interactive */
-            transform: scale(1.1);
-        }
-        #solveBtn:active {
-            transform: scale(0.95);
-        }
-        /* Logic part is unchanged */
-        #response-box {
-            margin-top: 30px;
-            font-size: 0.9rem;
-            color: #ccc;
-            max-height: 150px;
-            overflow-y: auto;
-            display: none;
-        }
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: 0.2s;
+        }        
+        .send-btn:active { transform: scale(0.9); }
+        #response { margin-top: 30px; font-size: 0.9rem; color: #ccc; text-align: left; max-height: 200px; overflow-y: auto; display: none; padding: 10px; background: #111; border-radius: 10px; }
     </style>
 </head>
 <body>
     <div class="container">
         <h1 class="user-name">Kaif</h1>
         <div class="divider"></div>
-        <p class="tagline">&lt;!DOCTYPE html&gt;</p>
-        <h2 class="brand-title">LLUMEN AI</h2>
-        <div class="moto-container">
-            <div class="moto-row">
-                <span>Spend your time</span>
-                <i class="fa-solid fa-xmark cross"></i>
-            </div>
-            <div class="moto-row">
-                <span>Invest your time</span>
-                <i class="fa-solid fa-check check"></i>
-            </div>
+        <p class="tagline">&lt;!DOCTYPE html&gt;</p>      
+        <h2 class="brand">LLUMEN AI</h2>     
+        <div class="moto">
+            <div>Spend your time <i class="fa-solid fa-xmark cross"></i></div>
+            <div>Invest your time <i class="fa-solid fa-check check"></i></div>
         </div>
-        <div class="search-wrapper">
-            <button id="micBtn" onclick="startMic()"><i class="fa-solid fa-microphone"></i></button>            
-            <input type="text" id="userInput" placeholder="Ask anything">          
-            <button id="solveBtn" onclick="sendQuery()">
-                <i class="fa-solid fa-arrow-up-circle"></i> </button>
+        <div class="search-pill">
+            <button class="send-btn" onclick="startMic()"><i class="fa-solid fa-microphone"></i></button>
+            <input type="text" id="userInput" placeholder="Ask anything">
+            <button class="send-btn" onclick="sendQuery()">
+                <i class="fa-solid fa-circle-arrow-up"></i>
+            </button>
         </div>
-        <div id="response-box"></div>
+        <div id="response"></div>
     </div>
     <script>
-        // No changes to logic, just UI fix
         async function sendQuery() {
-            const input = document.getElementById('userInput').value;
-            const resBox = document.getElementById('response-box');
-            const sendIcon = document.querySelector('#solveBtn i'); // Reference the icon
-            if(!input) return alert("Please enter a question!");
-            // UI feedback while processing
-            sendIcon.className = "fa-solid fa-spinner fa-spin"; // Change arrow to spinner
-            resBox.style.display = 'block';
-            resBox.innerText = "Analyzing numerical with Gemini...";
+            const query = document.getElementById('userInput').value;
+            const res = document.getElementById('response');
+            if(!query) return;
+            res.style.display = 'block';
+            res.innerText = "Analyzing...";
             try {
                 const response = await fetch('/api/search', {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({query: input})
+                    body: JSON.stringify({query: query})
                 });
                 const data = await response.json();
-                resBox.innerText = data.solution;
+                res.innerText = data.solution;
             } catch (e) {
-                resBox.innerText = "Error connecting to the LLUMEN API.";
-            } finally {
-                // Restore icon after processing
-                sendIcon.className = "fa-solid fa-arrow-up-circle";
+                res.innerText = "Error connecting to backend.";
             }
         }
-        // Logic integration for mic is complex and requires extra code, leaving placeholder
         function startMic() {
-            alert("Microphone activation logic is not yet integrated. Requires additional libraries and permissions.");
+            const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+            recognition.onresult = (e) => {                document.getElementById('userInput').value = e.results[0][0].transcript; 
+            };
+            recognition.start();
         }
     </script>
 </body>
