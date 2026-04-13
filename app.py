@@ -14,7 +14,7 @@ API_KEY = raw_key.strip()
 if API_KEY:
     try:
         genai.configure(api_key=API_KEY)
-        model = genai.GenerativeModel('gemini-1.5-flash')
+        model = genai.GenerativeModel('gemini-pro')
     except Exception as e:
         print(f"Setup Error: {e}")
 else:
