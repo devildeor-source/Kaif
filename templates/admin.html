@@ -1,1 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>LLUMEN | Admin</title>
+    <style>
+        body { background: #0a0a0a; color: white; font-family: sans-serif; padding: 40px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #333; padding: 12px; text-align: left; }
+        th { background: #2563eb; text-transform: uppercase; font-size: 0.8rem; }
+        tr:hover { background: #111; }
+    </style>
+</head>
+<body>
+    <h2>LLUMEN Search Logs</h2>
+    <table>
+        <thead><tr><th>Time</th><th>User Query</th></tr></thead>
+        <tbody>
+            {% for log in logs %}
+            <tr><td>{{ log.timestamp.strftime('%H:%M:%S') }}</td><td>{{ log.query }}</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>
 
