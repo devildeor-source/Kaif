@@ -7,7 +7,7 @@ from datetime import datetime
 app = Flask(__name__)
 
 # --- SECURE API SETUP ---
-# On Render, set 'GEMINI_API_KEY' in the Environment Variables tab
+# Render pulls this from the 'Environment Variables' you set
 API_KEY = os.environ.get("GEMINI_API_KEY")
 genai.configure(api_key=API_KEY)
 model = genai.GenerativeModel('gemini-1.5-flash')
@@ -34,7 +34,10 @@ def search():
     data = request.json
     user_query = data.get('query')
 
-    # Log the search for the Admin section
+    if not user_query:
+        return jsonify({"solution": "The search was empty."})
+
+    # Log the search for your Admin dashboard
     new_log = SearchLog(query=user_query)
     db.session.add(new_log)
     db.session.commit()
@@ -43,7 +46,7 @@ def search():
         response = model.generate_content(user_query)
         return jsonify({"solution": response.text})
     except Exception as e:
-        return jsonify({"solution": "Error: Check your API key in Render."})
+        return jsonify({"solution": "Error: Check your API Key in Render."})
 
 @app.route('/admin')
 def admin():
@@ -53,4 +56,4 @@ def admin():
 if __name__ == '__main__':
     port = int(os.environ.get("PORT", 5000))
     app.run(host='0.0.0.0', port=port)
-      
+    
