@@ -7,13 +7,22 @@ from datetime import datetime
 app = Flask(__name__)
 
 # --- SECURE API SETUP ---
-# Render pulls this from the 'Environment Variables' you set
-API_KEY = os.environ.get("GEMINI_API_KEY")
-genai.configure(api_key=API_KEY)
-model = genai.GenerativeModel('gemini-1.5-flash')
+# We use .strip() to automatically remove any accidental spaces you might have pasted in Render
+raw_key = os.environ.get("GEMINI_API_KEY", "")
+API_KEY = raw_key.strip()
+
+if API_KEY:
+    try:
+        genai.configure(api_key=API_KEY)
+        model = genai.GenerativeModel('gemini-1.5-flash')
+    except Exception as e:
+        print(f"Setup Error: {e}")
+else:
+    print("Environment Variable 'GEMINI_API_KEY' not found.")
 
 # --- DATABASE SETUP ---
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///llumen_ai.db'
+basedir = os.path.abspath(os.path.dirname(__file__))
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'llumen_ai.db')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
@@ -37,16 +46,24 @@ def search():
     if not user_query:
         return jsonify({"solution": "The search was empty."})
 
-    # Log the search for your Admin dashboard
-    new_log = SearchLog(query=user_query)
-    db.session.add(new_log)
-    db.session.commit()
+    # Log the search
+    try:
+        new_log = SearchLog(query=user_query)
+        db.session.add(new_log)
+        db.session.commit()
+    except:
+        pass
+
+    if not API_KEY:
+        return jsonify({"solution": "Error: GEMINI_API_KEY is not set in Render Environment Variables."})
 
     try:
+        # The AI processing
         response = model.generate_content(user_query)
         return jsonify({"solution": response.text})
     except Exception as e:
-        return jsonify({"solution": "Error: Check your API Key in Render."})
+        # This will tell us the EXACT error from Google (e.g., 'Expired Key' or 'Invalid Key')
+        return jsonify({"solution": f"AI Error: {str(e)}"})
 
 @app.route('/admin')
 def admin():
