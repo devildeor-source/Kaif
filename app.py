@@ -25,37 +25,28 @@ def search():
     if not user_query:
         return jsonify({"solution": "Please enter a message."})
 
-    # List of models to try in order of quality/availability in 2026
-    # If the first one has no quota, it automatically jumps to the next
+    # Updated 2026 stable model list
     models_to_try = [
-        'gemini-2.0-flash', 
+        'gemini-1.5-flash-latest', 
         'gemini-1.5-flash', 
-        'gemini-1.5-pro',
-        'gemini-1.0-pro'
+        'gemini-pro'
     ]
 
-    last_error = ""
     for model_name in models_to_try:
         try:
             model = genai.GenerativeModel(model_name)
             response = model.generate_content(user_query)
-            # If successful, return immediately
             return jsonify({"solution": response.text})
         except Exception as e:
             error_msg = str(e)
-            last_error = error_msg
-            # If it's a Quota (429) error, try the next model
-            if "429" in error_msg or "quota" in error_msg.lower():
+            # If it's a 404 (Model not found) or 429 (Quota), try the next one
+            if "404" in error_msg or "429" in error_msg:
                 continue 
             else:
-                # If it's a different error (like safety filters), stop and show it
                 return jsonify({"solution": f"AI Notice: {error_msg}"})
 
-    # If we get here, it means all models in the list failed
     return jsonify({
-        "solution": f"All free-tier models are currently busy or out of quota. Please wait a few minutes. (Last error: {last_error})"
+        "solution": "All models are currently unavailable. Please check your API key or try again in a moment."
     })
 
-# Required for Vercel
 app = app
-    
