@@ -5,11 +5,12 @@ import google.generativeai as genai
 app = Flask(__name__)
 
 # --- API SETUP ---
-# We use .strip() to ensure no accidental spaces break the key
+# Grabs the key from Vercel and removes any accidental spaces
 API_KEY = os.environ.get("GEMINI_API_KEY", "").strip()
 
 if API_KEY:
     genai.configure(api_key=API_KEY)
+    # Using the flash model for fastest response times
     model = genai.GenerativeModel('gemini-1.5-flash')
 
 @app.route('/')
@@ -19,10 +20,13 @@ def index():
 @app.route('/api/search', methods=['POST'])
 def search():
     if not API_KEY:
-        return jsonify({"solution": "API Key is missing in Vercel settings."})
+        return jsonify({"solution": "Configuration Error: API Key not found in Vercel settings."})
     
     data = request.json
-    user_query = data.get('query')
+    user_query = data.get('query', '')
+
+    if not user_query:
+        return jsonify({"solution": "Please enter a prompt."})
 
     try:
         response = model.generate_content(user_query)
@@ -30,5 +34,5 @@ def search():
     except Exception as e:
         return jsonify({"solution": f"AI Error: {str(e)}"})
 
-# Vital for Vercel's Python runtime
+# Vital for Vercel's Python runtime to locate the application
 app = app
