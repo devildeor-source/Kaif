@@ -4,9 +4,8 @@ import google.generativeai as genai
 
 app = Flask(__name__, template_folder='templates')
 
-# --- CONFIGURATION ---
+# Configure your key from Vercel environment variables
 API_KEY = os.environ.get("GEMINI_API_KEY", "").strip()
-
 if API_KEY:
     genai.configure(api_key=API_KEY)
 
@@ -17,19 +16,16 @@ def index():
 @app.route('/api/search', methods=['POST'])
 def search():
     if not API_KEY:
-        return jsonify({"solution": "Error: API Key is missing in Vercel settings."})
+        return jsonify({"solution": "API Key is missing. Add it to Vercel Settings."})
     
-    data = request.json
-    user_query = data.get('query', '')
+    user_query = request.json.get('query', '')
 
-    if not user_query:
-        return jsonify({"solution": "Please enter a message."})
-
-    # Updated 2026 stable model list
+    # 2026 Stable Model List: If one fails, it tries the next one automatically
     models_to_try = [
-        'gemini-1.5-flash-latest', 
-        'gemini-1.5-flash', 
-        'gemini-pro'
+        'gemini-3.1-flash',       # Newest 2026 Free Tier
+        'gemini-3.0-flash',       # Very stable 
+        'gemini-2.5-flash',       # Backup
+        'gemini-1.5-flash-latest' # Emergency fallback
     ]
 
     for model_name in models_to_try:
@@ -38,15 +34,12 @@ def search():
             response = model.generate_content(user_query)
             return jsonify({"solution": response.text})
         except Exception as e:
-            error_msg = str(e)
-            # If it's a 404 (Model not found) or 429 (Quota), try the next one
-            if "404" in error_msg or "429" in error_msg:
+            error_str = str(e)
+            # If the error is Quota (429) or Model Not Found (404), move to next model
+            if "429" in error_str or "404" in error_str:
                 continue 
-            else:
-                return jsonify({"solution": f"AI Notice: {error_msg}"})
+            return jsonify({"solution": f"AI Notice: {error_str}"})
 
-    return jsonify({
-        "solution": "All models are currently unavailable. Please check your API key or try again in a moment."
-    })
+    return jsonify({"solution": "All models are currently at their free limit. Please try again in 60 seconds."})
 
 app = app
