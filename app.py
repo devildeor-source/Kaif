@@ -11,7 +11,9 @@ API_KEY = os.environ.get("GEMINI_API_KEY", "").strip()
 if API_KEY:
     genai.configure(api_key=API_KEY)
     # Using 'gemini-2.0-flash' which is the standard for 2026 apps
-    model = genai.GenerativeModel('gemini-2.0-flash')
+    # Gemini 2.5 Flash is the most stable free model right now
+model = genai.GenerativeModel('gemini-2.5-flash')
+
     
 
 @app.route('/')
