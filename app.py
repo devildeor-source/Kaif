@@ -10,8 +10,9 @@ API_KEY = os.environ.get("GEMINI_API_KEY", "").strip()
 
 if API_KEY:
     genai.configure(api_key=API_KEY)
-    # Using the flash model for fastest response times
-    model = genai.GenerativeModel('gemini-1.5-flash')
+    # Using 'gemini-2.0-flash' which is the standard for 2026 apps
+    model = genai.GenerativeModel('gemini-2.0-flash')
+    
 
 @app.route('/')
 def index():
