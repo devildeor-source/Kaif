@@ -1,12 +1,12 @@
 import os
-import google.generativeai as genai
 from flask import Flask, request, jsonify, render_template
+from mistralai import Mistral
 
 app = Flask(__name__, template_folder='templates', static_folder='static')
 
-API_KEY = os.environ.get("GEMINI_API_KEY", "").strip()
-if API_KEY:
-    genai.configure(api_key=API_KEY)
+# Use the environment variable name exactly as it will be in Vercel
+api_key = os.environ.get("MISTRAL_API_KEY")
+client = Mistral(api_key=api_key)
 
 @app.route('/')
 def index():
@@ -16,18 +16,25 @@ def index():
 def search():
     data = request.get_json()
     user_query = data.get('query', '')
-    models = ['gemini-3.1-flash', 'gemini-3.0-flash', 'gemini-1.5-flash']
     
-    for model_name in models:
-        try:
-            model = genai.GenerativeModel(model_name)
-            response = model.generate_content(user_query)
-            # Answer + Pacing Reminder
-            return jsonify({"solution": response.text + "\n\n---\n*Tap again in 5-6s to keep connection stable.*"})
-        except Exception:
-            continue
-            
-    return '', 503
+    if not user_query:
+        return jsonify({"solution": "Please provide a query."}), 400
+
+    try:
+        # Mistral small is fast and efficient for mobile study tools
+        response = client.chat.complete(
+            model="mistral-small-latest",
+            messages=[{"role": "user", "content": user_query}]
+        )
+        
+        answer = response.choices[0].message.content
+        pacing = "\n\n---\n*Tap again in 5-6s to keep connection stable.*"
+        
+        return jsonify({"solution": answer + pacing})
+    except Exception:
+        # Return 503 so your index.html's 'cache: no-store' 
+        # logic can handle the reset smoothly
+        return '', 503
 
 if __name__ == '__main__':
     app.run(debug=True)
