@@ -18,6 +18,8 @@
 </head>
 <body>
 
+    <audio id="my-voice" src="{{ url_for('static', filename='welcome.mp3') }}"></audio>
+
     <div id="branding"><div class="logo">LLUMEN AI</div></div>
     <div id="result-area"><div id="solution"></div></div>
 
@@ -28,6 +30,11 @@
     </div>
 
     <script>
+        document.body.addEventListener('click', () => {
+            const audio = document.getElementById('my-voice');
+            if(audio) audio.play().catch(e => console.log("Audio blocked"));
+        }, { once: true });
+
         function startVoice() {
             const rec = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
             rec.lang = 'en-IN';
@@ -48,7 +55,6 @@
             sol.innerText = "LLUMEN is thinking...";
             
             try {
-                // FORCE: cache: 'no-store' prevents the browser from loading old error messages
                 const res = await fetch('/api/search', {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},
@@ -57,11 +63,8 @@
                 });
                 
                 if (res.status === 503) {
-                    sol.innerText = "API Limit reached. Please wait for the cooldown.";
-                    setTimeout(() => { 
-                        sol.innerText = ""; 
-                        btn.disabled = false; 
-                    }, 5000); 
+                    sol.innerText = "Connection limited. Waiting for reset...";
+                    setTimeout(() => { sol.innerText = ""; btn.disabled = false; }, 5000);
                 } else if (res.ok) {
                     const data = await res.json();
                     sol.innerText = data.solution;
