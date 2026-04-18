@@ -1,7 +1,18 @@
-from flask import Flask, request, jsonify, render_template
 import os
+from flask import Flask, request, jsonify, render_template
 
+# Initialize Flask
 app = Flask(__name__, template_folder='templates', static_folder='static')
+
+# Attempt to import Mistral
+try:
+    from mistralai import Mistral
+    # Initialize client inside the function to ensure it uses the latest environment variables
+    def get_mistral_client():
+        api_key = os.environ.get("MISTRAL_API_KEY")
+        return Mistral(api_key=api_key)
+except ImportError:
+    Mistral = None
 
 @app.route('/')
 def index():
@@ -9,23 +20,25 @@ def index():
 
 @app.route('/api/search', methods=['POST'])
 def search():
+    if Mistral is None:
+        return jsonify({"solution": "Error: 'mistralai' library is missing from the server."}), 500
+    
+    data = request.get_json()
+    user_query = data.get('query', '')
+    
+    if not user_query:
+        return jsonify({"solution": "Please provide a query."}), 400
+
     try:
-        # Step 1: Check if library exists
-        import mistralai
+        client = get_mistral_client()
+        response = client.chat.complete(
+            model="mistral-small-latest",
+            messages=[{"role": "user", "content": user_query}]
+        )
         
-        # Step 2: Check if key exists
-        api_key = os.environ.get("MISTRAL_API_KEY")
-        if not api_key:
-            return jsonify({"solution": "Error: MISTRAL_API_KEY is not set in Vercel settings!"})
-            
-        # Step 3: Try to initialize
-        from mistralai import Mistral
-        client = Mistral(api_key=api_key)
+        answer = response.choices[0].message.content
+        return jsonify({"solution": answer})
         
-        return jsonify({"solution": "Library and Key found! Ready to connect."})
-        
-    except ImportError:
-        return jsonify({"solution": "CRITICAL: 'mistralai' library is NOT installed on the server."})
     except Exception as e:
-        return jsonify({"solution": f"General Error: {str(e)}"})
+        return jsonify({"solution": f"AI Error: {str(e)}"}), 500
         
