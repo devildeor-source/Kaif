@@ -5,17 +5,19 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>LLUMEN AI</title>
     <style>
+        /* CSS: Minimalist Matte Black Aesthetic */
         body { background: #000; color: #fff; font-family: sans-serif; margin: 0; height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
         
         #branding { display: flex; flex-direction: column; justify-content: center; align-items: center; flex-grow: 1; text-align: center; }
-        .logo { font-size: 2.5rem; font-weight: 800; letter-spacing: 4px; }
+        .logo { font-size: 2.5rem; font-weight: 800; letter-spacing: 4px; color: #fff; }
         
         #result-area { display: none; padding: 20px; overflow-y: auto; flex-grow: 1; margin-bottom: 100px; }
-        #solution { max-width: 600px; margin: 20px auto; line-height: 1.7; white-space: pre-wrap; }
+        #solution { max-width: 600px; margin: 20px auto; line-height: 1.7; white-space: pre-wrap; color: #ddd; }
 
-        .search-container { position: fixed; bottom: 25px; left: 50%; transform: translateX(-50%); width: 90%; max-width: 500px; background: #111; border: 1px solid #333; border-radius: 30px; display: flex; padding: 10px 20px; align-items: center; }
-        #user-input { background: transparent; border: none; color: white; flex-grow: 1; outline: none; font-size: 1rem; }
-        .btn { background: transparent; border: none; color: #888; font-size: 1.2rem; cursor: pointer; padding: 0 10px; }
+        .search-container { position: fixed; bottom: 25px; left: 50%; transform: translateX(-50%); width: 90%; max-width: 500px; background: #111; border: 1px solid #333; border-radius: 30px; display: flex; padding: 10px 20px; align-items: center; z-index: 10; }
+        #user-input { background: transparent; border: none; color: white; flex-grow: 1; outline: none; font-size: 1rem; padding-left: 10px; }
+        .btn { background: transparent; border: none; color: #888; font-size: 1.2rem; cursor: pointer; padding: 0 10px; transition: 0.3s; }
+        .btn:disabled { color: #444; cursor: not-allowed; }
     </style>
 </head>
 <body>
@@ -32,42 +34,62 @@
     </div>
 
     <script>
-        // 1. Play your voice on the first screen click
+        // Play voice on first screen interaction
         document.body.addEventListener('click', () => {
             const audio = document.getElementById('my-voice');
             audio.play().catch(e => console.log("Audio play blocked: ", e));
         }, { once: true });
 
-        // 2. Microphone Logic
+        // Voice Input
         function startVoice() {
             const rec = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
             rec.lang = 'en-IN';
-            rec.onresult = (e) => { 
-                document.getElementById('user-input').value = e.results[0][0].transcript; 
-            };
+            rec.onresult = (e) => { document.getElementById('user-input').value = e.results[0][0].transcript; };
             rec.start();
         }
 
-        // 3. Search Logic (Kept your existing brain logic)
+        // Main AI Interaction
         async function askLumen() {
             const input = document.getElementById('user-input');
-            if (!input.value.trim()) return;
+            const btn = document.querySelector('button[onclick="askLumen()"]');
+            const sol = document.getElementById('solution');
             
+            if (!input.value.trim()) return;
+
+            // UI: Processing State
+            btn.disabled = true;
             document.getElementById('branding').style.display = 'none';
             document.getElementById('result-area').style.display = 'block';
-            document.getElementById('solution').innerText = "Processing...";
+            sol.innerText = "LLUMEN is thinking...";
             
-            const res = await fetch('/api/search', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({query: input.value})
-            });
-            const data = await res.json();
-            document.getElementById('solution').innerText = data.solution;
+            try {
+                const res = await fetch('/api/search', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({query: input.value})
+                });
+                
+                const data = await res.json();
+                
+                // Handle Response or Busy State
+                if (res.status === 503) {
+                    sol.innerText = "System busy. Please tap again in 2 seconds.";
+                    setTimeout(() => { sol.innerText = ""; }, 2500);
+                } else {
+                    sol.innerText = data.solution;
+                }
+            } catch (e) {
+                sol.innerText = "Connection error.";
+            }
+            
+            btn.disabled = false;
             input.value = "";
         }
-        
-        document.getElementById('user-input').addEventListener('keypress', (e) => { if(e.key==='Enter') askLumen(); });
+
+        // Support Enter Key
+        document.getElementById('user-input').addEventListener('keypress', (e) => { 
+            if(e.key === 'Enter') askLumen(); 
+        });
     </script>
 </body>
 </html>
