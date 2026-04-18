@@ -5,186 +5,72 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>LLUMEN AI</title>
     <style>
-        /* 1. MATTE BLACK THEME & CSS */
-        body {
-            background-color: #0a0a0a;
-            color: #ffffff;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            flex-direction: column;
-            height: 100vh;
-            overflow: hidden;
-        }
+        body { background: #000; color: #fff; font-family: sans-serif; margin: 0; height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
+        
+        #branding { display: flex; flex-direction: column; justify-content: center; align-items: center; flex-grow: 1; text-align: center; }
+        .user-tag { color: #007bff; font-weight: bold; margin-bottom: 5px; }
+        .logo { font-size: 2.5rem; font-weight: 800; letter-spacing: 4px; margin: 10px 0; }
+        .motto { opacity: 0.7; font-size: 0.9rem; line-height: 1.6; }
 
-        /* Branding Area (The part that vanishes) */
-        #branding-area {
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            height: 80vh;
-            text-align: center;
-            transition: opacity 0.5s ease;
-        }
+        #result-area { display: none; padding: 20px; overflow-y: auto; flex-grow: 1; margin-bottom: 100px; }
+        #solution { max-width: 600px; margin: 20px auto; line-height: 1.7; white-space: pre-wrap; }
 
-        .title-kaif {
-            color: #007bff;
-            font-size: 1.2rem;
-            margin-bottom: 5px;
-        }
-
-        .main-logo {
-            font-size: 3rem;
-            letter-spacing: 5px;
-            margin: 10px 0;
-            font-weight: bold;
-        }
-
-        .motto {
-            font-size: 1rem;
-            line-height: 1.8;
-            opacity: 0.8;
-        }
-
-        /* Solution Area (The part that appears) */
-        #solution-container {
-            display: none;
-            padding: 20px;
-            overflow-y: auto;
-            flex-grow: 1;
-            margin-bottom: 100px; /* Space for search bar */
-        }
-
-        #solution {
-            max-width: 800px;
-            margin: 0 auto;
-            line-height: 1.6;
-            color: #e0e0e0;
-            font-size: 1.1rem;
-            white-space: pre-wrap; /* Preserves AI formatting */
-        }
-
-        /* Fixed Bottom Search Bar */
-        .search-container {
-            position: fixed;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 90%;
-            max-width: 600px;
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 30px;
-            padding: 10px 20px;
-            display: flex;
-            align-items: center;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
-        }
-
-        #user-input {
-            background: transparent;
-            border: none;
-            color: white;
-            flex-grow: 1;
-            padding: 10px;
-            font-size: 1rem;
-            outline: none;
-        }
-
-        .search-btn {
-            background: #007bff;
-            color: white;
-            border: none;
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            cursor: pointer;
-            font-weight: bold;
-            transition: 0.3s;
-        }
-
-        .search-btn:hover {
-            background: #0056b3;
-        }
-
-        /* Animation */
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .fade-in { animation: fadeIn 0.6s ease forwards; }
+        .search-container { position: fixed; bottom: 25px; left: 50%; transform: translateX(-50%); width: 90%; max-width: 500px; background: #111; border: 1px solid #333; border-radius: 30px; display: flex; padding: 10px 20px; align-items: center; }
+        #user-input { background: transparent; border: none; color: white; flex-grow: 1; outline: none; font-size: 1rem; }
+        .btn { background: transparent; border: none; color: #888; font-size: 1.2rem; cursor: pointer; padding: 0 10px; }
+        .send-btn { color: #007bff; font-size: 1.5rem; }
     </style>
 </head>
 <body>
 
-    <div id="branding-area">
-        <div class="title-kaif">Kaif</div>
-        <div class="main-logo">LLUMEN AI</div>
-        <div class="motto">
-            <p>SPEND YOUR TIME ❌</p>
-            <p>INVEST YOUR TIME ✅</p>
-        </div>
+    <div id="branding">
+        <div class="user-tag">KAIF</div>
+        <div class="logo">LLUMEN AI</div>
+        <div class="motto">SPEND YOUR TIME ❌<br>INVEST YOUR TIME ✅</div>
     </div>
 
-    <div id="solution-container">
-        <div id="solution" class="fade-in"></div>
+    <div id="result-area">
+        <div id="solution"></div>
     </div>
 
     <div class="search-container">
-        <input type="text" id="user-input" placeholder="Ask LLUMEN anything..." autocomplete="off">
-        <button class="search-btn" onclick="askLumen()">↑</button>
+        <button class="btn" id="mic-btn" onclick="startVoice()">🎤</button>
+        <input type="text" id="user-input" placeholder="Ask LLUMEN..." autocomplete="off">
+        <button class="btn send-btn" onclick="askLumen()">↑</button>
     </div>
 
     <script>
-        async function askLumen() {
-            const inputField = document.getElementById('user-input');
-            const query = inputField.value.trim();
-            const branding = document.getElementById('branding-area');
-            const container = document.getElementById('solution-container');
-            const solutionDiv = document.getElementById('solution');
-
-            if (!query) return;
-
-            // 1. Vanish branding instantly
-            branding.style.display = 'none';
-
-            // 2. Show container and loading state
-            container.style.display = 'block';
-            solutionDiv.innerHTML = "<p style='color: #007bff; text-align: center;'>LLUMEN is thinking...</p>";
-
-            try {
-                const response = await fetch('/api/search', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ query: query })
-                });
-                
-                const data = await response.json();
-                
-                // 3. Display Result
-                solutionDiv.innerHTML = data.solution;
-                
-                // Optional: scroll to top of new answer
-                container.scrollTop = 0;
-                
-            } catch (error) {
-                solutionDiv.innerHTML = "<p style='color: #ff4444;'>Error: Couldn't reach the AI brain.</p>";
-            }
-
-            // Clear input for next question
-            inputField.value = '';
+        // --- VOICE LOGIC ---
+        function startVoice() {
+            const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+            recognition.lang = 'en-IN';
+            recognition.onresult = (e) => { document.getElementById('user-input').value = e.results[0][0].transcript; };
+            recognition.start();
         }
 
-        // Listen for Enter Key
-        document.getElementById('user-input').addEventListener('keypress', function (e) {
-            if (e.key === 'Enter') {
-                askLumen();
-            }
-        });
+        // --- SEARCH LOGIC ---
+        async function askLumen() {
+            const input = document.getElementById('user-input');
+            const branding = document.getElementById('branding');
+            const resultArea = document.getElementById('result-area');
+            const solution = document.getElementById('solution');
+            
+            if (!input.value.trim()) return;
+
+            branding.style.display = 'none';
+            resultArea.style.display = 'block';
+            solution.innerHTML = "Processing...";
+
+            const res = await fetch('/api/search', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({query: input.value})
+            });
+            const data = await res.json();
+            solution.innerHTML = data.solution;
+            input.value = "";
+        }
+        document.getElementById('user-input').addEventListener('keypress', (e) => { if(e.key==='Enter') askLumen(); });
     </script>
 </body>
 </html>
