@@ -1,6 +1,11 @@
 import os
+import sys
+# Force python to check the virtual environment paths
+sys.path.append('/vercel/path0/.vercel/python/.venv/lib/python3.12/site-packages')
+
 from flask import Flask, request, jsonify, render_template
 from mistralai import Mistral
+
 
 app = Flask(__name__, template_folder='templates', static_folder='static')
 
