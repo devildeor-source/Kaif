@@ -3,34 +3,29 @@ import os
 
 app = Flask(__name__, template_folder='templates', static_folder='static')
 
-# Safe import attempt
-try:
-    from mistralai import Mistral
-    MISTRAL_AVAILABLE = True
-except ImportError:
-    MISTRAL_AVAILABLE = False
-
 @app.route('/')
 def index():
     return render_template('index.html')
 
 @app.route('/api/search', methods=['POST'])
 def search():
-    if not MISTRAL_AVAILABLE:
-        return jsonify({"solution": "Error: Mistral library not found on server."}), 500
-    
-    data = request.get_json()
-    user_query = data.get('query', '')
-    
     try:
+        # Step 1: Check if library exists
+        import mistralai
+        
+        # Step 2: Check if key exists
         api_key = os.environ.get("MISTRAL_API_KEY")
+        if not api_key:
+            return jsonify({"solution": "Error: MISTRAL_API_KEY is not set in Vercel settings!"})
+            
+        # Step 3: Try to initialize
+        from mistralai import Mistral
         client = Mistral(api_key=api_key)
         
-        response = client.chat.complete(
-            model="mistral-small-latest",
-            messages=[{"role": "user", "content": user_query}]
-        )
-        return jsonify({"solution": response.choices[0].message.content})
+        return jsonify({"solution": "Library and Key found! Ready to connect."})
+        
+    except ImportError:
+        return jsonify({"solution": "CRITICAL: 'mistralai' library is NOT installed on the server."})
     except Exception as e:
-        return jsonify({"solution": f"AI Error: {str(e)}"}), 500
+        return jsonify({"solution": f"General Error: {str(e)}"})
         
