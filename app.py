@@ -4,7 +4,7 @@ from mistralai import Mistral
 
 app = Flask(__name__, template_folder='templates', static_folder='static')
 
-# Ensure MISTRAL_API_KEY is in Vercel Environment Variables
+# Ensure the API Key is retrieved from Vercel's Environment Variables
 api_key = os.environ.get("MISTRAL_API_KEY")
 client = Mistral(api_key=api_key)
 
@@ -17,15 +17,19 @@ def search():
     data = request.get_json()
     user_query = data.get('query', '')
     
+    if not user_query:
+        return jsonify({"solution": "Please provide a query."}), 400
+
     try:
         response = client.chat.complete(
             model="mistral-small-latest",
             messages=[{"role": "user", "content": user_query}]
         )
+        # Success
         return jsonify({"solution": response.choices[0].message.content})
-    except Exception:
-        return '', 503
+    except Exception as e:
+        # Returns 500 so you can see the error in Vercel logs if it fails
+        return jsonify({"solution": f"Server Error: {str(e)}"}), 500
 
-if __name__ == '__main__':
-    app.run(debug=True)
-    
+# DO NOT include app.run() or app=app
+# Vercel handles the application startup automatically.
