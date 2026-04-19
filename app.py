@@ -1,9 +1,10 @@
 import os
 from flask import Flask, render_template, request, jsonify
+# This import matches mistralai version 1.0.0
+from mistralai import Mistral
 
 app = Flask(__name__)
 
-# This route lets us verify if the server is even running at all
 @app.route('/health')
 def health():
     return "The server is alive!"
@@ -15,22 +16,26 @@ def index():
 @app.route('/api/search', methods=['POST'])
 def search():
     try:
-        # Step 1: Check if Environment Variable exists
+        data = request.get_json()
+        user_query = data.get('query', '')
+        
         api_key = os.environ.get("MISTRAL_API_KEY")
         if not api_key:
-            return jsonify({"solution": "CRITICAL ERROR: MISTRAL_API_KEY is not set in Vercel settings."})
+            return jsonify({"solution": "Error: API Key missing."})
 
-        # Step 2: Attempt import (to see if the library is actually found)
-        from mistralai import Mistral
-        
-        # Step 3: Perform dummy call
+        # Initialize the client
         client = Mistral(api_key=api_key)
-        # This will tell us if the library usage itself is the problem
-        return jsonify({"solution": "Connection successful, but search logic paused for testing."})
+        
+        # Make the request
+        response = client.chat.complete(
+            model="mistral-small-latest",
+            messages=[{"role": "user", "content": user_query}]
+        )
+        
+        return jsonify({"solution": response.choices[0].message.content})
         
     except Exception as e:
-        # THIS WILL PRINT THE EXACT ERROR ON YOUR PHONE SCREEN
-        return jsonify({"solution": f"DETAILED ERROR: {str(e)}"})
+        return jsonify({"solution": f"Error: {str(e)}"})
 
 if __name__ == '__main__':
     app.run()
