@@ -1,43 +1,35 @@
 import os
-from flask import Flask, request, jsonify, render_template
+from flask import Flask, render_template, request, jsonify
 from mistralai import Mistral
 
 app = Flask(__name__)
 
-# Initialize the Mistral client using the API key from environment variables
-def get_client():
-    api_key = os.environ.get("MISTRAL_API_KEY")
-    if not api_key:
-        raise ValueError("MISTRAL_API_KEY is not set.")
-    return Mistral(api_key=api_key)
-
 @app.route('/')
 def index():
-    # This renders your index.html file
     return render_template('index.html')
 
 @app.route('/api/search', methods=['POST'])
 def search():
     try:
+        # If this part crashes, we catch it
         data = request.get_json()
-        user_query = data.get('query', '')
+        query = data.get('query', '')
         
-        if not user_query:
-            return jsonify({"solution": "Query cannot be empty."}), 400
-
-        client = get_client()
+        # Test Mistral
+        api_key = os.environ.get("MISTRAL_API_KEY")
+        if not api_key:
+            return jsonify({"solution": "Error: API Key missing in Vercel settings!"})
+            
+        client = Mistral(api_key=api_key)
         response = client.chat.complete(
             model="mistral-small-latest",
-            messages=[{"role": "user", "content": user_query}],
-            timeout=20.0
+            messages=[{"role": "user", "content": query}]
         )
+        return jsonify({"solution": response.choices[0].message.content})
         
-        answer = response.choices[0].message.content
-        return jsonify({"solution": answer})
-
     except Exception as e:
-        # This will return the actual error so you can see why it crashes
-        return jsonify({"solution": f"Error: {str(e)}"}), 500
+        # THIS WILL SHOW THE ERROR ON YOUR PHONE SCREEN
+        return jsonify({"solution": f"CRITICAL ERROR: {str(e)}"})
 
 if __name__ == '__main__':
     app.run()
