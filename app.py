@@ -1,18 +1,17 @@
 import os
 from flask import Flask, request, jsonify, render_template
+from mistralai import Mistral
 
 # Initialize Flask
-app = Flask(__name__, template_folder='templates', static_folder='static')
+app = Flask(__name__)
 
-# Attempt to import Mistral
-try:
-    from mistralai import Mistral
-    # Initialize client inside the function to ensure it uses the latest environment variables
-    def get_mistral_client():
-        api_key = os.environ.get("MISTRAL_API_KEY")
-        return Mistral(api_key=api_key)
-except ImportError:
-    Mistral = None
+# Initialize Mistral client
+# It is better to initialize the client once globally if possible
+def get_client():
+    api_key = os.environ.get("MISTRAL_API_KEY")
+    if not api_key:
+        raise ValueError("MISTRAL_API_KEY is not set in environment variables.")
+    return Mistral(api_key=api_key)
 
 @app.route('/')
 def index():
@@ -20,9 +19,6 @@ def index():
 
 @app.route('/api/search', methods=['POST'])
 def search():
-    if Mistral is None:
-        return jsonify({"solution": "Error: 'mistralai' library is missing from the server."}), 500
-    
     data = request.get_json()
     user_query = data.get('query', '')
     
@@ -30,15 +26,20 @@ def search():
         return jsonify({"solution": "Please provide a query."}), 400
 
     try:
-        client = get_mistral_client()
+        client = get_client()
+        # We explicitly set a timeout here. Vercel functions have limits;
+        # if Mistral takes longer than 10-15 seconds, we want it to error 
+        # out rather than hang the browser session indefinitely.
         response = client.chat.complete(
             model="mistral-small-latest",
-            messages=[{"role": "user", "content": user_query}]
+            messages=[{"role": "user", "content": user_query}],
+            timeout=15.0 
         )
         
         answer = response.choices[0].message.content
         return jsonify({"solution": answer})
         
     except Exception as e:
-        return jsonify({"solution": f"AI Error: {str(e)}"}), 500
+        # Returning the error helps you see exactly why it failed in the browser
+        return jsonify({"solution": f"Server Error: {str(e)}"}), 500
         
